@@ -15,7 +15,9 @@ perl ./ezy_authentication.pl
 - สร้าง user เพื่อใช้ในการ authenticator
 
   - Create user
+  
     useradd -m -d /home/{{user}} -s -c "EzyAdmin Account" {{user}}
+    
   - Find ID of user group wheel
     id -g wheel
   - Add user to group wheel
