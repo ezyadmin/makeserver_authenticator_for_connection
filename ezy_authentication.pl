@@ -176,14 +176,14 @@ use Data::Dumper;
       ## Setup default sudoers
       eval {
         if (-f '/etc/sudoers') {
-          EzyAdminSystem::execute("sed -i 's/^Defaults\\s*requiretty\\s*/# Defaults    requiretty\n/g' /etc/sudoers");
+          EzyAdminSystem::execute("sed -i 's/^Defaults\\s*requiretty\\s*/# Defaults    requiretty\\n/g' /etc/sudoers");
         }
         my $alias = <<EOF;
 Cmnd_Alias SHELLS= /bin/ksh, /bin/zsh, \\
   /bin/csh, /bin/tcsh, \\
   /usr/bin/login, /usr/sbin/nologin
 EOF
-        EzyAdminFiles::put_content('/etc/sudoers', $alias);
+        EzyAdminFiles::put_content('/etc/sudoers.d/SHELLS', $alias);
         my $contents = <<EOF;
 $authorize_user ALL=(ALL) NOPASSWD:ALL, !SHELLS
 EOF
