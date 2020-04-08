@@ -112,4 +112,10 @@ perl ./ezy_authentication.pl
     csf -r
 ```
 
+- Look up SSH port
+
+```
+netstat -tapen | grep /sshd | awk '{print $4}'
+```
+
 ### Windows
