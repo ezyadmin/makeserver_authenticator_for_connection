@@ -105,10 +105,8 @@ use Data::Dumper;
     
     print "\n";
     my ($confirm);
-    do {
-      $confirm = EzyAdminSystem::prompt("Press any key to continue or press \"x\" to exit.");
-      chomp($confirm)
-    } while ($confirm eq '');
+    $confirm = EzyAdminSystem::prompt("Press any key to continue or press \"x\" to exit.", 1);
+    chomp($confirm)
     if (lc($confirm) eq 'x') {
       print "\n";
       exit;
@@ -262,11 +260,12 @@ use Data::Dumper;
 {
   sub prompt {
     my $promptLable = shift;
+    my $allowBlank = shift;
     my $promptValue = '';
     do {
       print "\x1b[36m➖\x1b[0m " .$promptLable . " ";
       chomp($promptValue = <STDIN>);
-    } while ($promptValue eq '');
+    } while ($promptValue eq '' && $allowBlank ne 1);
         
     return $promptValue;
   }
