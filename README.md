@@ -158,9 +158,7 @@ perl ./ezy_authentication.pl
 
 * Start >> run >> certlm.msc >> Personal >> Certificates >> คลิ๊กขวา IPServer >> All Tasks >> Export
 
-
-![enter image description here](https://sway.office.com/s/WDx3cT2ztrCzNtfI/images/dEK2jxK7_Y3clf?quality=800)
-
+![export](/images/export.png)
 
 3. Create Transport HTTPS Run command in **Powershell**
 
