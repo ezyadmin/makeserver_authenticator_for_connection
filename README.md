@@ -34,9 +34,9 @@ perl ./ezy_authentication.pl
 
 - ค้นหา group execute id สำหรับ /bin/su
 
-```
-    perl -e 'use strict; use Fcntl ":mode"; my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = lstat("/bin/su"); my $otherExecute = $mode & S_IXOTH; if ($otherExecute) { my $userGroup = getgrgid($gid); my $groupExecute = ($mode & S_IXGRP) >> 3; if ($userGroup ne "root" && $groupExecute eq 1) { print "\$userGroup\n";} else { print "NULL\n";}} else { print "NULL\n";}'
-```
+  ```
+      perl -e 'use strict; use Fcntl ":mode"; my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = lstat("/bin/su"); my $otherExecute = $mode & S_IXOTH; if ($otherExecute) { my $userGroup = getgrgid($gid); my $groupExecute = ($mode & S_IXGRP) >> 3; if ($userGroup ne "root" && $groupExecute eq 1) { print "\$userGroup\n";} else { print "NULL\n";}} else { print "NULL\n";}'
+  ```
 
 - ถ้าหากค่า group execute id สำหรับ /bin/su ไม่ได้มา ไม่มีค่าเป็น NULL ให้ทำการ Add user to group xxx ด้วย
 
@@ -176,12 +176,13 @@ perl ./ezy_authentication.pl
 
    * dir wsman:\localhost\listener
 
-![enter image description here](https://sway.office.com/s/WDx3cT2ztrCzNtfI/images/WPLEHzgaJ-Ir9K?quality=480)
+![listener](/images/listener.png)
+
 7. Import Certificate 
 
    * Start >> run >> certlm.msc >> Trusted Root Certification Authorities  >> Certificates >> คลิ๊กขวา >> All Tasks >> Import ( ไฟล์ที่เรา Export ไว้ในข้อ 2) 
 
-![enter image description here](https://sway.office.com/s/WDx3cT2ztrCzNtfI/images/ZoYMRNzEdUx35k?quality=800)
+![listener](/images/import.png)
 
 8. Run command test connection in **Powershell**
 
