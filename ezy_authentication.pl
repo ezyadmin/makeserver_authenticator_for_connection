@@ -218,7 +218,7 @@ allow_ips=$allow_ips
 ssh_key=$publickey
 ssh_port=$ssh_port
 EOF
-    EzyAdminFiles::put_content("/etc/ezyadmin_activate.data", $contents, "a+");
+    EzyAdminFiles::put_content("/etc/ezyadmin_activate.data", $contents);
 
 
     my $output .= <<EOF;
