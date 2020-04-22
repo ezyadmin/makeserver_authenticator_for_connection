@@ -227,7 +227,7 @@ perl ./ezy_authentication.pl
 ----
 ### Step 4. Download ezyadmin activate server script
 
-- Download file ezyactivate.pl Click [Download](https://203.78.103.159/code/serverconnection) and Run >> perl ezyactivate.pl in **Powershell**
+- Download file ezyactivate.pl Click [Download](https://raw.githubusercontent.com/ezyadmin/makeserver_authenticator_for_connection/master/ezy_authentication.pl) and Run >> perl ezyactivate.pl in **Powershell**
 
 ### Step 5. สคริปจะถาม Ansible URL, และ Secret Key ในการติดตั้ง ให้นำข้อมูล Ansible Server ของ custommer ไปกรอก
 
