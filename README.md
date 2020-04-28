@@ -5,6 +5,8 @@
 ## ใช้ script ช่วยในการติดตั้ง
 
 ```
+mkdir -p /usr/local/ezyadmin
+cd /usr/local/ezyadmin/
 wget https://github.com/ezyadmin/makeserver_authenticator_for_connection/archive/1.0.tar.gz -O makeserver_authenticator_for_connection.tar.gz
 tar -zxvf makeserver_authenticator_for_connection.tar.gz
 cd makeserver_authenticator_for_connection-1.0
