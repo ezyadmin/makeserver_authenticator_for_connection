@@ -106,7 +106,7 @@ use Data::Dumper;
     print "\n";
     my ($confirm);
     $confirm = EzyAdminSystem::prompt("Press any key to continue or press \"x\" to exit.", 1);
-    chomp($confirm)
+    chomp($confirm);
     if (lc($confirm) eq 'x') {
       print "\n";
       exit;
