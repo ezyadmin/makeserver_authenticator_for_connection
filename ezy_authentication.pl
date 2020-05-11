@@ -45,7 +45,7 @@ use Data::Dumper;
     if ($^O eq 'MSWin32') {
       EzyAdminActivateAuth::activate_on_windows();
     } else {
-      EzyAdminActivateAuth::activate_on_linux()
+      EzyAdminActivateAuth::activate_on_linux();
     }
   }
 
