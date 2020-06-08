@@ -1,145 +1,146 @@
 # Make server authenticator for connect to EzyAdmin
 
-วิธีการสร้าง User เพื่อใช้ใน connection server เข้าสู่ระบบ EzyAdmin
+How to make server authenticator for connect to EzyAdmin. 
 
-## ใช้ script ช่วยในการติดตั้ง
+## For Linux
 
-```
+## Installer Script
+
+```bash
 mkdir -p /usr/local/ezyadmin
 cd /usr/local/ezyadmin/
 wget https://github.com/ezyadmin/makeserver_authenticator_for_connection/archive/latest.tar.gz -O makeserver_authenticator_for_connection.tar.gz
-tar -zxvf makeserver_authenticator_for_connection.tar.gz
+tar -zxf makeserver_authenticator_for_connection.tar.gz
 cd makeserver_authenticator_for_connection-latest
 perl ./ezy_authentication.pl
 ```
 
-## ติดตั้งเอง
+You need to fill out something.
 
-สามารถติดตั้งเองโดยทำตามขั้นตอนต่อไปนี้
+## Install yourself
 
-### Linux
+- Create user for authenticator
+- Create user via command
 
-- สร้าง user เพื่อใช้ในการ authenticator
-
-  - Create user
-
-```
+```bash
     useradd -m -d /home/{{user}} -s -c "EzyAdmin Account" {{user}}
 ```
 
 - Find ID of user group wheel
 
-```
+```bash
     id -g wheel
 ```
 
 - Add user to group wheel
 
-```
+```bash
     usermod -a -G {{group_wheel_id}} {{user}}
 ```
 
-- ค้นหา group execute id สำหรับ /bin/su
+- Find group execute id for /bin/su
 
-  ```
-      perl -e 'use strict; use Fcntl ":mode"; my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = lstat("/bin/su"); my $otherExecute = $mode & S_IXOTH; if ($otherExecute) { my $userGroup = getgrgid($gid); my $groupExecute = ($mode & S_IXGRP) >> 3; if ($userGroup ne "root" && $groupExecute eq 1) { print "\$userGroup\n";} else { print "NULL\n";}} else { print "NULL\n";}'
-  ```
-
-- ถ้าหากค่า group execute id สำหรับ /bin/su ไม่ได้มา ไม่มีค่าเป็น NULL ให้ทำการ Add user to group xxx ด้วย
-
+```bash
+    perl -e 'use strict; use Fcntl ":mode"; my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = lstat("/bin/su"); my $otherExecute = $mode & S_IXOTH; if ($otherExecute) { my $userGroup = getgrgid($gid); my $groupExecute = ($mode & S_IXGRP) >> 3; if ($userGroup ne "root" && $groupExecute eq 1) { print "\$userGroup\n";} else { print "NULL\n";}} else { print "NULL\n";}'
 ```
+
+- If not get the value of group execute id for /bin/su or the value is not "NULL" , add user to group "xxx".
+
+```bash
     usermod -a -G {{su_execute_group_id}} {{user}}
 ```
 
-- Add public key to file authorized_keys for user
+- Add public key to authorized_keys file  for user
+-Create folder '.ssh' in path /home/{{user}}
 
-  - สร้างโฟเดอร์ /home/{{user}}/.ssh
-
-```
+```bash
     mkdir -p /home/{{user}}/.ssh
 ```
 
-- สร้างไฟล์ /home/{{user}}/.ssh/authorized_keys
+- Create  authorized_keys file in path /home/{{user}}/.ssh/
 
-```
+```bash
     touch /home/{{user}}/.ssh/authorized_keys
 ```
 
-- บันทึกค่า SSH public key ที่ได้จาก EzyAdmin/Server onboarding ลงในไฟย์ /home/{{user}}/.ssh/authorized_keys
-- Setup permissions and owner
+- Copy public key that get from EzyAdmin/Server onboarding and then fill out in /home/{{user}}/.ssh/authorized_keys then save.
+- Set permissions and owner of folder .ssh and authorized_keys file.
 
-```
+```bash
     chmod 700 /home/{{user}}/.ssh
     chmod 0600 /home/{{user}}/.ssh/authorized_keys
     chwon {{user}}:{{user}} /home/{{user}}/.ssh
     chwon {{user}}:{{user}} /home/{{user}}/.ssh/authorized_keys
 ```
 
-- Setup defaults sudoers
-  - Comment Line: Defaults requiretty in file /etc/sudoers
+- Set defaults sudoers
+- Comment Line: Defaults require tty in file /etc/sudoers
 
-```
+```bash
     sed -i "s/^Defaults\s*requiretty\s*/# Defaults requiretty\n/g" /etc/sudoers
 ```
 
 - Edit "Cmnd_Alias SHELLS" in file /etc/sudoers.d/SHELLS
 
-```
+```bash
     Cmnd_Alias SHELLS= /bin/ksh, /bin/zsh, /bin/csh, /bin/tcsh, /usr/bin/login, /usr/sbin/nologin
 ```
 
 - Edit in file /etc/sudoers.d/{{user}}
 
-```
+```bash
     {{user}} ALL=(ALL) NOPASSWD:ALL, !SHELLS
 ```
 
-- Setup permissions
+- Set permissions
 
-```
+```bash
     chmod 440 /etc/sudoers.d/SHELLS
     chmod 440 /etc/sudoers.d/{{user}}
 ```
 
 - Allow EzyAdmin on filewall (csf)
-  - Add EzyAdmin IP (Lookup in EzyAdmin App)
+- Add EzyAdmin IP (Lookup in EzyAdmin App)
 
-```
+```bash
     csf --add {{EzyAdmin IP}} "EzyAdmin Ansible Server"
 ```
 
 - Restart csf filewall
 
-```
+```bash
     csf -r
 ```
 
 - Look up SSH port
 
-```
+```bash
 netstat -tapen | grep /sshd | awk '{print $4}'
 ```
 
 ### Windows
+
 ## การติดตั้งโฮสต์เพื่อเชื่อมต่อระบบสำหรับ Windows Server
 
 ### ก่อนจะติดตั้ง Tools ต่างๆ ให้สร้าง User สำหรับใช้งาน Ansible ก่อน
 
  สร้าง User ชื่อ Ansible โดยกำหนดสิทธิ์ให้เป็น Administrator เพื่อทำการเชื่อมต่อกับ Ansible
+
  1. เข้าไปที่ Control Panel >> User Accounts >> User Accounts >> Manage Accounts >> **_Add a user account_**
  2. ใส่ชื่อ User : Ansible และ Password โดยมีเงื่อนไขประกอบด้วย ตัวอักษรภาษาอังกฤษพิมพ์ใหญ่ ,เล็ก ,อักขระ ,ตัวเลข ผสมอยู่อย่างน้อย 1 ตัว
  3. ที่หน้า Manage Accounts ให้ทำการเปลี่ยน Type User : Ansible เป็น Administrator เลือก User Ansible >> Change the account type >> Administrator >> Click **_Change Account Type_**
- 
+
 เพียงเท่านี้ก็มี User สำหรับใช้งาน Ansible แล้ว
 
 ----
 ต่อไปจะเป็นขั้นตอนการติดตั้ง Tools ต่างๆ เพื่อที่จะใช้งานกับระบบ
 
- เริ่มต้นโดย Remote Desktop ด้วย User : **_Administrator_** 
+ เริ่มต้นโดย Remote Desktop ด้วย User : **_Administrator_**
 
 ### Step 1. Install perl command
 
 - Download and setup perl Click [Download](http://strawberryperl.com) **(Recommended version)**
+
 ----
 ### Step 2. Install CPAN module with command line
 
@@ -149,23 +150,25 @@ netstat -tapen | grep /sshd | awk '{print $4}'
 ### Step 3. Setup && Config WinRM
 #### 3.1 : Setup WinRM, use this script, run the following in PowerShell:
 
-* $url = "[https://netwayws.com/ConfigureRemotingForAnsible.ps1](https://netwayws.com/ConfigureRemotingForAnsible.ps1)"
+```powershell
+$url = "https://netwayws.com/ConfigureRemotingForAnsible.ps1"
+$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
+powershell.exe -ExecutionPolicy ByPass -File $file
+```
 
-* $file = "\$env:temp\ConfigureRemotingForAnsible.ps1"
-
-* powershell.exe -ExecutionPolicy ByPass -File $file
-  
 #### 3.2 : Enable basic authentication in PowerShell
 
-*  Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
-
-* winrm set winrm/config/service '@{AllowUnencrypted="true"}'
-
+```powershell
+Set-Item -Path WSMan:\localhost\Service\Auth\Basic -Value $true
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+```
 #### 3.3 : Install SSL WinRm
 
 1. Create Cert Run command in **Powershell**
 
-  *  $Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName **"IPServer"** 
+  ```powershell
+  $Cert = New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName **YOUR IPServer** 
+  ```
 
 2. Export Cert
 
@@ -175,19 +178,27 @@ netstat -tapen | grep /sshd | awk '{print $4}'
 
 3. Create Transport HTTPS Run command in **Powershell**
 
- * New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint –Force 
+```powershell
+New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint –Force 
+```
 
 4. Create Port 5986 บน Firewall Run command in **Powershell**
 
-* New-NetFirewallRule -DisplayName "Windows Remote Management (HTTPS-In)" -Name "Windows Remote Management (HTTPS-In)" -Profile Any -LocalPort 5986 -Protocol TCP
+```powershell
+New-NetFirewallRule -DisplayName "Windows Remote Management (HTTPS-In)" -Name "Windows Remote Management (HTTPS-In)" -Profile Any LocalPort 5986 -Protocol TCP
+```
 
 5. Enable Https Listener Run command in **Powershell**
 
-* Set-Item WSMan:\localhost\Service\EnableCompatibilityHttpsListener -Value true 
+```powershell
+Set-Item WSMan:\localhost\Service\EnableCompatibilityHttpsListener -Value true 
+```
 
 6. Check listener port Run command in **Powershell**
 
-   * dir wsman:\localhost\listener
+```powershell
+dir wsman:\localhost\listener
+```
 
 ![listener](/images/listener.png)
 
@@ -199,55 +210,51 @@ netstat -tapen | grep /sshd | awk '{print $4}'
 
 8. Run command test connection in **Powershell**
 
-  * winrs -r:https://##IPServer##:5986/wsman -u:##Username## -p:##Password## -ssl ipconfig
+```powershell
+winrs -r:https://##IPServer##:5986/wsman -u:##Username## -p:##Password## -ssl ipconfig
+```
 
+Example & Output
+```powershell
 > PS D:\Download> winrs -r:https://192.168.0.10:5986/wsman -> u:administrator -p:0123456789 -ssl ipconfig 
->
-> Windows IP Configuration 
 
-> Ethernet adapter Ethernet: 
-
->    Connection-specific DNS Suffix  . : 
-
->   IPv4 Address. . . . . . . . . . . : 192.168.0.10
-
->   Subnet Mask . . . . . . . . . . . : 255.255.255.0 
-
->   Default Gateway . . . . . . . . . : 192.168.0.1 
-
-> Tunnel adapter 6TO4 Adapter: 
-
->    Connection-specific DNS Suffix  . : 
-
->   IPv6 Address. . . . . . . . . . . :2001:db8:a1b2:12::2
-
->   Default Gateway . . . . . . . . . : 2001:db8:a1b2:12::1 
-
->   Media State . . . . . . . . . . . : Media disconnected 
-
->  Connection-specific DNS Suffix  . : 
-
+  Windows IP Configuration 
+  Ethernet adapter Ethernet: 
+    Connection-specific DNS Suffix  . : 
+    IPv4 Address. . . . . . . . . . . : 192.168.0.10
+    Subnet Mask . . . . . . . . . . . : 255.255.255.0 
+    Default Gateway . . . . . . . . . : 192.168.0.1 
+  Tunnel adapter 6TO4 Adapter: 
+     Connection-specific DNS Suffix  . : 
+    IPv6 Address. . . . . . . . . . . :2001:db8:a1b2:12::2
+    Default Gateway . . . . . . . . . : 2001:db8:a1b2:12::1 
+    Media State . . . . . . . . . . . : Media disconnected 
+  Connection-specific DNS Suffix  . : 
+```
 #### 3.4 : Test connection
 
-**_=== Test out HTTP ==_**
+**Test out HTTP**
 
-   - winrs -r:http://##Server##:5985/wsman -u:##Username## -p:##Password## ipconfig
+```powershell
+winrs -r:http://##Server##:5985/wsman -u:##Username## -p:##Password## ipconfig
+```
+**Test out HTTPS (will fail if the cert is not verifiable)**
 
-**_=== Test out HTTPS (will fail if the cert is not verifiable) ==_**
-
-- winrs -r:https://##Server##:5986/wsman -u:##Username## -p:##Password## -ssl ipconfig
+```powershell
+winrs -r:https://##Server##:5986/wsman -u:##Username## -p:##Password## -ssl ipconfig
+```
 
 ----
 ### Step 4. Download ezyadmin activate server script
 
-- Download file ezyactivate.pl Click [Download](ezy_authentication.pl) and Run >> perl ezyactivate.pl in 
-
-**Powershell**
+- Download file ezyactivate.pl Click [Download](ezy_authentication.pl) and Run >> perl ezyactivate.pl in **Powershell**
 
 ### Step 5. สคริปจะถาม Ansible URL, และ Secret Key ในการติดตั้ง ให้นำข้อมูล Ansible Server ของ custommer ไปกรอก
 
-> *  Ansible URL: http://203.78.103.160
-> * Secret Key: a227da47cfb7d6975d8055675a43ac3ca473830a870577a16f20ed741b402e186d0a719e0be48add
+```text
+Ansible URL : http://203.78.103.160
+Secret Key : a227da47cfb7d6975d8055675a43ac3ca473830a870577a16f20ed741b402e186d0a719e0be48add
+```
 
 ### Step 6. เมื่อทำการติดตั้งเพื่อเชื่อมต่อระบบเสร็จ ให้ไปยืนยันการเชื่อมต่อระบบที่ Admin Server List
 
