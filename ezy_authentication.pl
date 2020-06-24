@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Carp;
-use Data::Dumper;
+# use Data::Dumper;
 
 my $signature = <<EOF;
 #######################################################
@@ -39,7 +39,7 @@ package EzyAdminActivateAuth;
 use strict;
 use warnings;
 use Fcntl ':mode';
-use Data::Dumper;
+# use Data::Dumper;
 {
   sub init {
     if ($^O eq 'MSWin32') {
@@ -245,7 +245,7 @@ package EzyAdminDeactivateAuth;
 use strict;
 use warnings;
 use vars qw ($INSTANCE);
-use Data::Dumper;
+# use Data::Dumper;
 {
   sub init {
     print "\x1b[33m❗\x1b[0m Under construction\n"; exit;
@@ -256,7 +256,7 @@ use Data::Dumper;
 package EzyAdminSystem;
 use strict;
 use warnings;
-use Data::Dumper;
+# use Data::Dumper;
 {
   sub prompt {
     my $promptLable = shift;
@@ -265,7 +265,7 @@ use Data::Dumper;
     do {
       print "\x1b[36m➖\x1b[0m " .$promptLable . " ";
       chomp($promptValue = <STDIN>);
-    } while ($promptValue eq '' && $allowBlank ne 1);
+    } while ($promptValue eq '' && defined $allowBlank && $allowBlank ne 1);
         
     return $promptValue;
   }
@@ -417,7 +417,7 @@ package EzyAdminFiles;
 use strict;
 use warnings;
 use Fcntl qw(:flock SEEK_END);
-use Data::Dumper;
+# use Data::Dumper;
 {
   sub get_contents {
     my $filename = shift;

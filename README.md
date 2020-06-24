@@ -4,7 +4,15 @@ How to make server authenticator for connect to EzyAdmin.
 
 ## For Linux
 
-## Installer Script
+## Install Dependencies
+
+- Perl
+
+```bash
+yum intall -y perl
+```
+
+## Script Installer (Recommended)
 
 ```bash
 mkdir -p /usr/local/ezyadmin
