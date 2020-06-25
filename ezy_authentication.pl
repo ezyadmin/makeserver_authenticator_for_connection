@@ -188,6 +188,7 @@ EOF
         EzyAdminFiles::put_content('/etc/sudoers.d/' . $authorize_user, $contents);
         EzyAdminSystem::changemod('0440', '/etc/sudoers');
         EzyAdminSystem::changemod('0700', '/etc/sudoers.d/' . $authorize_user);
+        EzyAdminSystem::changemod('0440', '/etc/sudoers.d/SHELLS');
         print "\x1b[32m✔️\x1b[0m Append SSH public key to file $ssh_dir/authorized_keys\n";
 
       };
