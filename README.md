@@ -9,7 +9,7 @@ How to make server authenticator for connect to EzyAdmin.
 - Perl
 
 ```bash
-yum intall -y perl
+yum install -y perl
 ```
 
 ## Script Installer (Recommended)
