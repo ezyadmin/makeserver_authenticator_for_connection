@@ -14,10 +14,10 @@ my $signature = <<EOF;
 #             /___/               
 ######################################################
 EOF
-print "\x1b[36m\x1b[5m" . $signature . "\x1b[0m\n";
+print $signature . "\n";
 
 if ($> != 0) {
-    print "\x1b[31m❌ Error: You must run this script by root permission, otherwise, you will not have privilege to properly install.\x1b[0m\n";
+    print "\x1b[31mError: You must run this script by root permission, otherwise, you will not have privilege to properly install.\x1b[0m\n";
     exit;
 }
 
@@ -50,13 +50,51 @@ use Fcntl ':mode';
   }
 
   sub activate_on_linux {
-    print "\x1b[34m❓\x1b[0m Please answer the following questions.\n";
+    print "Please answer the following questions.\n";
     my ($authorize_user);
     my ($create_new_user) = 1; 
     do {
-      my $input_user = EzyAdminSystem::prompt("Do you want allow EzyAdmin remote access to this server with user (Create new if not exist):");
+      # my $input_user = EzyAdminSystem::prompt("Do you want allow EzyAdmin remote access to this server with user (Create new if not exist):");
+      # if (getpwnam($input_user)) {
+      #   print "Found user \"$input_user\" in this server.\n";
+      #   my $make_sure;
+      #   do {
+      #     $make_sure = EzyAdminSystem::prompt("You make sure allow EzyAdmin remote access to this server with user \"$input_user\" [y/n]:");
+      #     chomp($make_sure);
+      #     $make_sure = lc($make_sure);
+      #   } while ($make_sure ne 'y' && $make_sure ne 'n');
+      #   if ($make_sure eq 'n') {
+      #     $authorize_user = '';
+      #   } else {
+      #     $authorize_user = $input_user;
+      #     $create_new_user = 0;
+      #   }
+      # } else {
+      #   $authorize_user = $input_user;
+      # }
+      my $input_user = '';
+      my $default_user = EzyAdminSystem::prompt("Allow EzyAdmin access to this server as root using ezyadmin user? [y/n]");
+      if ($default_user eq 'y') {
+        $input_user = 'ezyadmin'
+      } else {
+        my $is_check_reserved = 0;
+        do {
+          $input_user = EzyAdminSystem::prompt("Please enter the user name to allow EzyAdmin access to this server as root (create new user if it doesn't exist):");
+          # print "===>\$input_user=$input_user\n";
+          if ($input_user && $input_user =~ /^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$/) {
+            $is_check_reserved = EzyAdminFunction::validate_reserved_user($input_user);
+            # print "===>\$is_check_reserved=$is_check_reserved\n";
+            if (!$is_check_reserved) {
+              EzyAdminFunction::print_error("User '$input_user' is a reserved username on EzyAdmin System")
+            }
+          } else {
+            # print "===>verify user not pass : $input_user\n";
+            EzyAdminFunction::print_error("User '$input_user' invalid.")
+          }
+        } while (!$is_check_reserved);
+      }
       if (getpwnam($input_user)) {
-        print "\x1b[33m❗\x1b[0m Found user \"$input_user\" in this server.\n";
+        print "Found user \"$input_user\" in this server.\n";
         my $make_sure;
         do {
           $make_sure = EzyAdminSystem::prompt("You make sure allow EzyAdmin remote access to this server with user \"$input_user\" [y/n]:");
@@ -78,7 +116,7 @@ use Fcntl ':mode';
     do {
       $publickey = EzyAdminSystem::prompt("Please input SSH public key (Loop up from EzyAdmin/Server onboarding):");
       if ($publickey !~ /^ssh-rsa / && $publickey !~ /^from=\"/) {
-        print "\x1b[33m❗\x1b[0m Sorry, it's not SSH public key pattern, please input again.\n";
+        print "Sorry, it's not SSH public key pattern, please input again.\n";
         $publickey = "";
       }
     } while ($publickey eq '');
@@ -90,17 +128,17 @@ use Fcntl ':mode';
     }
 
     print "\n";
-    print "\x1b[34mℹ️\x1b[0m Task Information.\n";
-    print "\x1b[34m➖\x1b[0m OS Type: Linux\n";
+    print "Task Information.\n";
+    print "OS Type: Linux\n";
     if ($create_new_user) {
-      print "\x1b[34m➖\x1b[0m Create new user \"$authorize_user\" for remote access.\n";
+      print "Create new user \"$authorize_user\" for remote access.\n";
     } else {
-      print "\x1b[34m➖\x1b[0m Allow remote access with user \"$authorize_user\".\n";
+      print "Allow remote access with user \"$authorize_user\".\n";
     }
-    print "\x1b[34m➖\x1b[0m Set authentcation to user \"$authorize_user\" with SSH public key.\n";
-    print "\x1b[34m➖\x1b[0m Setup defaults sudoers for user \"$authorize_user\" with SSH public key.\n";
+    print "Set authentcation to user \"$authorize_user\" with SSH public key.\n";
+    print "Setup defaults sudoers for user \"$authorize_user\" with SSH public key.\n";
     if ($allow_ips ne "" && EzyAdminCSF::have_csf()) {
-      print "\x1b[34m➖\x1b[0m Allow EzyAdmin IP address \"$allow_ips\" on csf firewall.\n";
+      print "Allow EzyAdmin IP address \"$allow_ips\" on csf firewall.\n";
     }
     
     print "\n";
@@ -111,14 +149,14 @@ use Fcntl ':mode';
       print "\n";
       exit;
     } else {
-      print "\x1b[34m➖\x1b[0m Begin activate.\n";
+      print "Begin activate.\n";
 
       ## Setup user to access
       if ($create_new_user) {
         eval {
           my $shell_path = EzyAdminSystem::cmd_which('bash');
           EzyAdminSystem::execute("useradd $authorize_user -m -d /home/$authorize_user -s $shell_path -c 'EzyAdmin remote access account'");
-          print "\x1b[32m✔️\x1b[0m Create user \"$authorize_user\" has been successuly.\n";
+          print "Create user \"$authorize_user\" has been successuly.\n";
         };
         if ($@) {
           print $@;
@@ -131,7 +169,7 @@ use Fcntl ':mode';
           chomp($wheel_id);
           if ($wheel_id ne '') {
             EzyAdminSystem::execute("usermod -a -G $wheel_id $authorize_user");
-            print "\x1b[32m✔️\x1b[0m Append user \"$authorize_user\" to group \"wheel\".\n";
+            print "Append user \"$authorize_user\" to group \"wheel\".\n";
           }
 
           my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = lstat($su_path);
@@ -141,7 +179,7 @@ use Fcntl ':mode';
             my $groupExecute = ($mode & S_IXGRP) >> 3;
             if ($userGroup ne 'root' && $groupExecute eq 1) {
               EzyAdminSystem::execute("usermod -a -G $userGroup $authorize_user");
-              print "\x1b[32m✔️\x1b[0m Append user \"$authorize_user\" to group \"$userGroup\" for execute command $su_path.\n";
+              print "Append user \"$authorize_user\" to group \"$userGroup\" for execute command $su_path.\n";
             }
           }
         };
@@ -164,7 +202,7 @@ use Fcntl ':mode';
         EzyAdminSystem::changemod('0600', $authorized_keys_file);
         EzyAdminSystem::changeowner($authorize_user, $authorize_user, $ssh_dir);
         EzyAdminSystem::changeowner($authorize_user, $authorize_user, $authorized_keys_file);
-        print "\x1b[32m✔️\x1b[0m Append SSH public key to file $ssh_dir/authorized_keys\n";
+        print "Append SSH public key to file $ssh_dir/authorized_keys\n";
       };
       if ($@) {
         print $@;
@@ -189,7 +227,7 @@ EOF
         EzyAdminSystem::changemod('0440', '/etc/sudoers');
         EzyAdminSystem::changemod('0440', '/etc/sudoers.d/' . $authorize_user);
         EzyAdminSystem::changemod('0440', '/etc/sudoers.d/SHELLS');
-        print "\x1b[32m✔️\x1b[0m Append SSH public key to file $ssh_dir/authorized_keys\n";
+        print "Append SSH public key to file $ssh_dir/authorized_keys\n";
 
       };
       if ($@) {
@@ -203,7 +241,7 @@ EOF
       if ($allow_ips ne "" && EzyAdminCSF::have_csf()) {
         my @ipList = split(",", $allow_ips);
         EzyAdminCSF::allow_ips(@ipList);
-        print "\x1b[32m✔️\x1b[0m Allow EzyAdmin IPS in csf firewall.\n";
+        print "Allow EzyAdmin IPS in csf firewall.\n";
       }
     };
     if ($@) {
@@ -224,10 +262,9 @@ EOF
 
     my $output .= <<EOF;
 
-\x1b[34mℹ️\x1b[0m Information for connection (server onboarding) 
-\x1b[34m➖\x1b[0m Authorize User: $authorize_user
-\x1b[34m➖\x1b[0m SSH Port: $ssh_port
-
+  Information for connection (server onboarding) 
+  Authorize User: $authorize_user
+  SSH Port: $ssh_port
 
 Please go to EzyAdmin application and put this information to server onboarding step connection. 
 EOF
@@ -236,8 +273,8 @@ EOF
   }
 
   sub activate_on_windows {
-    print "\x1b[34mℹ️\x1b[0m OS Type: Windows\n";
-    print "\x1b[33m❗\x1b[0m Under construction\n"; exit;
+    print "OS Type: Windows\n";
+    print "Under construction\n"; exit;
   }
 }
 
@@ -249,7 +286,7 @@ use vars qw ($INSTANCE);
 # use Data::Dumper;
 {
   sub init {
-    print "\x1b[33m❗\x1b[0m Under construction\n"; exit;
+    print "Under construction\n"; exit;
   }
 }
 
@@ -264,7 +301,7 @@ use warnings;
     my $allowBlank = shift;
     my $promptValue = '';
     do {
-      print "\x1b[36m➖\x1b[0m " .$promptLable . " ";
+      print $promptLable . " ";
       chomp($promptValue = <STDIN>);
     } while ($promptValue eq '' && defined $allowBlank && $allowBlank ne 1);
         
@@ -484,6 +521,37 @@ use warnings;
     chomp($version);
     return $version;
   }
+}
+
+package EzyAdminFunction;
+use strict;
+use warnings;
+# use Data::Dumper;
+{
+  sub validate_reserved_user {
+    my $username = shift;
+    my $filename = 'data/reserved.txt';
+    my $is_useable = 1;
+
+    open(my $fh, '<:encoding(UTF-8)', $filename)
+      or die "Could not open file '$filename' $!";
+    
+    while ((my $row = <$fh>) && $is_useable) {
+      chomp $row;
+      $row =~ s/^\s+|\s+$//g ;
+      #print "==>$row\n";
+      if ($row eq $username) {
+        $is_useable = 0;
+      }
+    }
+    return $is_useable;
+  }
+  sub print_error {
+    my $err_message = shift;
+    print "\x1b[31mError: $err_message\x1b[0m\n";
+    return 0;
+  }
+
 }
 1;
 __END__ 

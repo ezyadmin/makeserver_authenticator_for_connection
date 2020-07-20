@@ -255,7 +255,7 @@ winrs -r:https://##Server##:5986/wsman -u:##Username## -p:##Password## -ssl ipco
 ----
 ### Step 4. Download ezyadmin activate server script
 
-- Download file ezyactivate.pl Click [Download](ezy_authentication.pl) and Run >> perl ezyactivate.pl in **Powershell**
+- Download file ezyactivate.pl [Click Right and Save link as](https://raw.githubusercontent.com/ezyadmin/makeserver_authenticator_for_connection/master/ezy_authentication.pl) and Run >> perl ezy_authentication.pl in **Powershell**
 
 ### Step 5. สคริปจะถาม Ansible URL, และ Secret Key ในการติดตั้ง ให้นำข้อมูล Ansible Server ของ custommer ไปกรอก
 
