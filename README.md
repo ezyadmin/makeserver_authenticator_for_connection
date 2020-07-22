@@ -193,7 +193,7 @@ New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -Certificat
 4. Create Port 5986 บน Firewall Run command in **Powershell**
 
 ```powershell
-New-NetFirewallRule -DisplayName "Windows Remote Management (HTTPS-In)" -Name "Windows Remote Management (HTTPS-In)" -Profile Any LocalPort 5986 -Protocol TCP
+New-NetFirewallRule -DisplayName "Windows Remote Management (HTTPS-In)" -Name "Windows Remote Management (HTTPS-In)" -Profile Any -LocalPort 5986 -Protocol TCP
 ```
 
 5. Enable Https Listener Run command in **Powershell**
@@ -253,7 +253,7 @@ winrs -r:https://##Server##:5986/wsman -u:##Username## -p:##Password## -ssl ipco
 ```
 
 ----
-### Step 4. Download ezyadmin activate server script
+<!-- ### Step 4. Download ezyadmin activate server script
 
 - Download file ezyactivate.pl [Click Right and Save link as](https://raw.githubusercontent.com/ezyadmin/makeserver_authenticator_for_connection/master/ezy_authentication.pl) and Run >> perl ezy_authentication.pl in **Powershell**
 
@@ -266,4 +266,4 @@ Secret Key : a227da47cfb7d6975d8055675a43ac3ca473830a870577a16f20ed741b402e186d0
 
 ### Step 6. เมื่อทำการติดตั้งเพื่อเชื่อมต่อระบบเสร็จ ให้ไปยืนยันการเชื่อมต่อระบบที่ Admin Server List
 
-### Step 7. คลิ๊กที่ activated เพื่อยืนยันของมูลสิทธิ์การเข้าถึงโฮสต์ และเลือก connector เพื่อเชื่อมต่อระบบ
+### Step 7. คลิ๊กที่ activated เพื่อยืนยันของมูลสิทธิ์การเข้าถึงโฮสต์ และเลือก connector เพื่อเชื่อมต่อระบบ -->
