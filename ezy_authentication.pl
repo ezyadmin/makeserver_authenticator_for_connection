@@ -536,7 +536,7 @@ use warnings;
     open(my $fh, '<:encoding(UTF-8)', $filename)
       or die "Could not open file '$filename' $!";
     
-    while ((my $row = <$fh>) && $is_useable) {
+    while (defined(my $row = <$fh>) && $is_useable) {
       chomp $row;
       $row =~ s/^\s+|\s+$//g ;
       #print "==>$row\n";
