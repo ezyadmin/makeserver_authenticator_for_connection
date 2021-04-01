@@ -126,6 +126,102 @@ You need to fill out something.
 netstat -tapen | grep /sshd | awk '{print $4}'
 ```
 
+## For Ubuntu 
+
+```bash
+ apt-get install perl -y
+```
+## Script Installer (Recommended)
+```bash
+
+mkdir -p /usr/local/ezyadmin
+cd /usr/local/ezyadmin/
+wget https://github.com/ezyadmin/makeserver_authenticator_for_connection/archive/latest.tar.gz -O makeserver_authenticator_for_connection.tar.gz
+tar -zxf makeserver_authenticator_for_connection.tar.gz
+cd makeserver_authenticator_for_connection-latest
+perl ./ezy_authentication.pl
+```
+You need to fill out something.
+
+## Install yourself
+- adduser
+
+```/bin/bash 
+useradd -s /bin/bash  -d /home/{{user}} -m -c "EzyAdmin Account" {{user}}
+```
+
+- Add public key to authorized_keys file  for user
+-Create folder '.ssh' in path /home/{{user}}
+
+```bash
+    mkdir -p /home/{{user}}/.ssh
+```
+
+- Create  authorized_keys file in path /home/{{user}}/.ssh/
+
+```bash
+    touch /home/{{user}}/.ssh/authorized_keys
+```
+
+- Copy public key that get from EzyAdmin/Server onboarding and then fill out in /home/{{user}}/.ssh/authorized_keys then save.  
+
+
+- Set permissions and owner of folder .ssh and authorized_keys file.
+
+```bash
+    chmod 700 /home/{{user}}/.ssh
+    chmod 0600 /home/{{user}}/.ssh/authorized_keys
+    chwon {{user}}:{{user}} /home/{{user}}/.ssh
+    chwon {{user}}:{{user}} /home/{{user}}/.ssh/authorized_keys
+```
+
+- Set defaults sudoers
+- Comment Line: Defaults require tty in file /etc/sudoers
+
+```bash
+    sed -i "s/^Defaults\s*requiretty\s*/# Defaults requiretty\n/g" /etc/sudoers
+```
+
+- Edit "Cmnd_Alias SHELLS" in file /etc/sudoers.d/SHELLS
+
+```bash
+    Cmnd_Alias SHELLS= /bin/ksh, /bin/zsh, /bin/csh, /bin/tcsh, /usr/bin/login, /usr/sbin/nologin
+```
+
+- Edit in file /etc/sudoers.d/{{user}}
+
+```bash
+    {{user}} ALL=(ALL) NOPASSWD:ALL, !SHELLS
+```
+
+- Set permissions
+
+```bash
+    chmod 440 /etc/sudoers.d/SHELLS
+    chmod 440 /etc/sudoers.d/{{user}}
+```
+
+- Allow EzyAdmin on filewall (csf)
+- Add EzyAdmin IP (Lookup in EzyAdmin App)
+
+```bash
+    csf --add {{EzyAdmin IP}} "EzyAdmin Ansible Server"
+```
+
+- Restart csf filewall
+
+```bash
+    csf -r
+```
+
+- Look up SSH port
+
+```bash
+netstat -tapen | grep /sshd | awk '{print $4}'
+```
+
+
+
 ### Windows
 
 ## การติดตั้งโฮสต์เพื่อเชื่อมต่อระบบสำหรับ Windows Server
