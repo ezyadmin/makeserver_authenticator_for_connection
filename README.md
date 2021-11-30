@@ -364,3 +364,83 @@ Secret Key : a227da47cfb7d6975d8055675a43ac3ca473830a870577a16f20ed741b402e186d0
 ### Step 6. เมื่อทำการติดตั้งเพื่อเชื่อมต่อระบบเสร็จ ให้ไปยืนยันการเชื่อมต่อระบบที่ Admin Server List
 
 ### Step 7. คลิ๊กที่ activated เพื่อยืนยันของมูลสิทธิ์การเข้าถึงโฮสต์ และเลือก connector เพื่อเชื่อมต่อระบบ -->
+
+**ปัญหาที่พบ**
+**Error : 1#**
+
+Winrs error:The WinRM client cannot process the request. If the authentication scheme is different from Kerberos, or if the client computer is not joined to a domain, then HTTPS transport must be used or the destination machine must be added to the TrustedHosts configuration setting. Use winrm.cmd to configure TrustedHosts. Note that computers in the Trusted
+
+Hosts list might not be authenticated. You can get more information about that by running the following command: winrm help config.
+
+**สาเหตุ**
+
+ติดเรื่องสิทธิ์การใช้งาน ทำให้เข้าใช้งานไม่ได้
+
+**แก้ไขโดย**
+Run command : 
+```
+Set-Item wsman:\localhost\client\trustedhosts * -Forc
+```
+
+**Error : 2#**
+
+Winrs error:The SSL connection cannot be established. Verify that the service on the remote host is properly configured to listen for HTTPS requests. Consult the logs and documentation for the WS-Management service running on the destination, most commonly IIS or WinRM. If the destination is the WinRM service, run the following command on the destination to analyze and configure the WinRM service: "winrm quickconfig -transport: HTTPs".
+
+Run command : 
+```
+winrm quickconfig -transport:https
+```
+PS D:\Download> winrm quickconfig -transport:https
+
+WinRM service is already running on this machine.
+
+WSManFault
+
+Message
+
+ProviderFault
+
+WSManFault
+
+Message = Cannot create a WinRM listener on HTTPS because this machine does not have an appropriate certificate. To be used for SSL, a certificate must have a CN matching the hostname, be appropriate for Server Authentication, and not be expired, revoked, or self-signed.
+
+Error number: -2144108267 0x80338115
+
+Cannot create a WinRM listener on HTTPS because this machine does not have an appropriate certificate. To be used for SSL, a certificate must have a CN matching the hostname, be appropriate for Server Authentication, and not be expired, revoked, or self-signed.
+
+**สาเหตุ**
+
+ไม่พบ Certificate หรือ Certificate ไม่ตรงกับชื่อที่ใช้งานไม่ตรงกัน
+
+**แก้ไข**
+
+ติดตั้ง Certificate ให้ถูกต้องตามขั้นตอนที่ได้สร้างไว้ให้ ในข้อ 1-7
+
+
+**Error : 3#**
+
+Winrs error:The server certificate on the destination computer (##DNS Lable Name##:5986) has the
+
+following errors: The SSL certificate contains a common name (CN) that does not match the hostname.
+
+**แก้ไขโดย** เข้า Powershell ให้ run command ตามนี้
+
+1. แสดงรายการ listener
+
+· dir wsman:\localhost\listener
+
+2. ลบข้อมูล Listener HTTPS เก่าออกก่อน
+
+· Remove-Item -Path WSMan:\localhost\Listener\Listener_1305953032 –Recurse
+
+3. เพิ่ม Listener HTTPS ใหม่เข้าไป
+
+· New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $Cert.Thumbprint –Force
+
+4. Run Script ทดสอบอีกครั้ง
+
+**อ้างอิงจาก**
+
+· https://4sysops.com/archives/powershell-remoting-over-https-with-a-self-signed-ssl-certificate/
+
+· https://support.microsoft.com/en-us/help/2019527/how-to-configure-winrm-for-https · https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/how-to-view-certificates-with-the-mmc-snap-in#to-view-certificates-for-the-current-user
